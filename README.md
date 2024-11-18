@@ -1,5 +1,9 @@
 <h1 align="center">FEFU backend tasks</h1>
 
+<h2>Требования</h2>
+<p>- Python 3.12</p>
+<p>- Django 3.2 или выше</p>
+
 <h2>Локальный запуск</h2>
 
 <li>Клонируйте репозиторий</li>
