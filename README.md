@@ -18,10 +18,6 @@
 Для Windows:
 ```myenv\Scripts\activate```
 
-<li>Установите зависимости</li>
-
-```pip install -r requirements.txt```
-
 <li>Примените миграции базы данных</li>
 
 ```python manage.py migrate```
