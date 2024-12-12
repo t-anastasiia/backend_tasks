@@ -1,9 +1,8 @@
-import logging
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 import requests
+import logging
 
 FIRST_SERVER_URL = "https://backend-tasks-9r0i.onrender.com"
-
 logger = logging.getLogger(__name__)
 
 def proxy(request, path=""):
@@ -21,7 +20,7 @@ def proxy(request, path=""):
         return HttpResponse(
             response.content,
             status=response.status_code,
-            content_type=response.headers.get('Content-Type', 'application/json')
+            content_type=response.headers.get('Content-Type', 'text/plain')
         )
     except requests.exceptions.RequestException as e:
         logger.error(f"Error while forwarding request: {e}")
