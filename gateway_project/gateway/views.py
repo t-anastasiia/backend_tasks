@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def proxy(request, path=""):
     method = request.method
     data = request.body
-    headers = {key: value for key, value in request.headers.items() if key != 'Host'}
+    headers = {key: value for key, value in request.headers.items() if key.lower() != 'host'}
 
     try:
         response = requests.request(
@@ -18,9 +18,9 @@ def proxy(request, path=""):
             headers=headers
         )
         return HttpResponse(
-            response.content,
+            response.content.decode('utf-8'),  
             status=response.status_code,
-            content_type=response.headers.get('Content-Type', 'text/plain')
+            content_type="text/plain"
         )
     except requests.exceptions.RequestException as e:
         logger.error(f"Error while forwarding request: {e}")
