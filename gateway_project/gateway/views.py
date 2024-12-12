@@ -18,18 +18,23 @@ def proxy(request, path=""):
             headers=headers
         )
 
-        if response.headers.get('Content-Type', '').startswith('text/plain'):
-            decoded_content = response.content.decode('utf-8', errors='replace')  
+        logger.info(f"Content-Type from server: {response.headers.get('Content-Type')}")
+        logger.info(f"Raw content: {response.content}")
+
+        content_type = response.headers.get('Content-Type', 'text/plain')
+
+        if content_type.startswith('text/'):
+            decoded_content = response.content.decode('utf-8', errors='replace')
             return HttpResponse(
                 decoded_content,
                 status=response.status_code,
-                content_type="text/plain"
+                content_type=content_type
             )
 
         return HttpResponse(
             response.content,
             status=response.status_code,
-            content_type=response.headers.get('Content-Type', 'application/octet-stream')
+            content_type=content_type
         )
 
     except requests.exceptions.RequestException as e:
