@@ -21,7 +21,7 @@ def proxy(request, path=""):
         logger.info(f"Content-Type from server: {response.headers.get('Content-Type')}")
         logger.info(f"Raw content: {response.content}")
 
-        content_type = response.headers.get('Content-Type', 'text/plain')
+        content_type = response.headers.get('Content-Type', 'text/html')
 
         if content_type.startswith('text/'):
             decoded_content = response.content.decode('utf-8', errors='replace')
