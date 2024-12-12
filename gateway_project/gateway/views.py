@@ -17,8 +17,9 @@ def proxy(request, path=""):
             data=data,
             headers=headers
         )
+        decoded_content = response.content.decode('utf-8', errors='replace')
         return HttpResponse(
-            response.content.decode('utf-8'),  
+            decoded_content,
             status=response.status_code,
             content_type="text/plain"
         )
