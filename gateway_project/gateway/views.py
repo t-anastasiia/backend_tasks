@@ -18,16 +18,20 @@ def proxy(request, path=""):
             headers=headers
         )
 
-        logger.info(f"Response content: {response.content}")  
-
-        decoded_content = response.content.decode('utf-8', errors='replace')
-        logger.info(f"Decoded content: {decoded_content}")
+        if response.headers.get('Content-Type', '').startswith('text/plain'):
+            decoded_content = response.content.decode('utf-8', errors='replace')  
+            return HttpResponse(
+                decoded_content,
+                status=response.status_code,
+                content_type="text/plain"
+            )
 
         return HttpResponse(
-            decoded_content,
+            response.content,
             status=response.status_code,
-            content_type="text/plain"
+            content_type=response.headers.get('Content-Type', 'application/octet-stream')
         )
+
     except requests.exceptions.RequestException as e:
         logger.error(f"Error while forwarding request: {e}")
         return JsonResponse({"error": str(e)}, status=500)
