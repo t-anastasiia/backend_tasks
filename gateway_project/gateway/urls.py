@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import proxy_view
+from .views import root_view, proxy_view
 
 urlpatterns = [
-    path('', proxy_view, {'path': ''}),  # Корневой путь
-    path('<path:path>', proxy_view),     # Все остальные пути
+    path('', root_view, name='home'), 
+    path('<path:path>', proxy_view, name='proxy'), 
 ]
