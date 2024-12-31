@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-om(_z-fyfo((6odldx4hgtcfykll_jn@*a+e9facpv5n&h7h&#
 DEBUG = True
 
 ALLOWED_HOSTS = ['gateway-project.onrender.com']
-CSRF_TRUSTED_ORIGINS = ['https://backend-tasks-9r0i.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['https://gateway-project.onrender.com', 'https://backend-tasks-9r0i.onrender.com']
 
 
 # Application definition

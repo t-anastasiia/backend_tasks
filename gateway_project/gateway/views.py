@@ -1,36 +1,29 @@
 import requests
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import QueryDict
 
-FIRST_SERVER_URL = "https://backend-tasks-9r0i.onrender.com"
+BASE_SERVER_URL = 'https://backend-tasks-9r0i.onrender.com/'
 
-class GatewayView(APIView):
-    def forward_request(self, request, endpoint):
-        url = f"{FIRST_SERVER_URL}/{endpoint}"
-        method = request.method
-        headers = {
-            key: value for key, value in request.headers.items() if key != 'Host'
-        }
-        data = request.body if method in ['POST', 'PUT', 'PATCH'] else None
+@csrf_exempt
+def proxy_view(request, path):
+    url = BASE_SERVER_URL + path
+    headers = {key: value for key, value in request.headers.items() if key != 'Host'}
 
-        try:
-            response = requests.request(method, url, headers=headers, data=data)
-            return Response(
-                data=response.json() if response.content else None,
-                status=response.status_code,
-                content_type=response.headers.get('Content-Type')
-            )
-        except requests.exceptions.RequestException as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_502_BAD_GATEWAY
-            )
+    try:
+        if request.method == 'GET':
+            response = requests.get(url, headers=headers, params=request.GET)
+        elif request.method == 'POST':
+            if request.content_type == 'application/json':
+                response = requests.post(url, headers=headers, json=request.body)
+            else:
+                data = QueryDict(request.body)
+                response = requests.post(url, headers=headers, data=data)
+        elif request.method == 'PUT':
+            response = requests.put(url, headers=headers, json=request.body)
+        elif request.method == 'DELETE':
+            response = requests.delete(url, headers=headers)
 
-    def get(self, request, *args, **kwargs):
-        endpoint = request.path_info.lstrip('/')  
-        return self.forward_request(request, endpoint)
-
-    def post(self, request, *args, **kwargs):
-        endpoint = request.path_info.lstrip('/') 
-        return self.forward_request(request, endpoint)
+        return HttpResponse(response.content, status=response.status_code, content_type=response.headers.get('Content-Type', 'text/plain'))
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to connect to the main server', 'details': str(e)}, status=500)

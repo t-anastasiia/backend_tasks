@@ -1,6 +1,6 @@
-from django.urls import re_path
-from .views import GatewayView
+from django.urls import path, re_path
+from . import views
 
 urlpatterns = [
-    re_path(r'.*', GatewayView.as_view(), name='gateway'),
+    re_path(r'^(?P<path>.*)$', views.proxy_view), 
 ]
