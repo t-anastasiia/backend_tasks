@@ -6,28 +6,9 @@ BASE_SERVER_URL = 'https://backend-tasks-9r0i.onrender.com/'
 
 @csrf_exempt
 def root_view(request):
-    if request.method == 'HEAD':
-        url = BASE_SERVER_URL
+    if request.method == 'HEAD' or request.method == 'GET':
+        url = BASE_SERVER_URL  
         headers = {key: value for key, value in request.headers.items() if key.lower() != 'host'}
-
-        try:
-            response = requests.head(url, headers=headers, stream=True)
-
-            django_response = HttpResponse(
-                status=response.status_code,
-                content_type=response.headers.get('Content-Type')
-            )
-            
-            for header, value in response.headers.items():
-                if header.lower() not in ['content-encoding', 'transfer-encoding', 'content-length']:
-                    django_response[header] = value
-
-            return django_response
-
-        except requests.RequestException as e:
-            return JsonResponse({'error': 'Failed to connect to the main server', 'details': str(e)}, status=500)
-    else:
-        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
 @csrf_exempt
 def proxy_view(request, path=""):
