@@ -1,7 +1,6 @@
-from django.urls import path
-from .views import root_view, proxy_view
+from django.urls import path, re_path
+from . import views
 
 urlpatterns = [
-    path('', root_view, name='home'), 
-    path('<path:path>', proxy_view, name='proxy'), 
+    re_path(r'^(?P<path>.*)$', views.gateway_view, name='gateway'),
 ]
