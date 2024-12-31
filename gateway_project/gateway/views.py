@@ -1,51 +1,30 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 import requests
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
-BASE_SERVER_URL = 'https://backend-tasks-9r0i.onrender.com/'
-
-@csrf_exempt
-def root_view(request):
-    try:
-        response = requests.request(
-            method=request.method,
-            url=BASE_SERVER_URL,
-            headers={key: value for key, value in request.headers.items() if key.lower() != 'host'},
-            data=request.body,
-            params=request.GET
-        )
-        return HttpResponse(response.content, status=response.status_code, content_type=response.headers.get('Content-Type'))
-    except requests.RequestException as e:
-        return HttpResponse(f"Error: {e}", status=500)
+FIRST_SERVER_URL = 'https://backend-tasks-9r0i.onrender.com/'
 
 @csrf_exempt
-def proxy_view(request, path=""):
-    url = BASE_SERVER_URL + path
-    headers = {key: value for key, value in request.headers.items() if key.lower() != 'host'}
-
+def gateway_view(request, path=''):
+    url = f"{FIRST_SERVER_URL}/{path}" 
+    
     try:
-        if request.method == 'GET':
-            response = requests.get(url, headers=headers, params=request.GET, stream=True)
-        elif request.method == 'POST':
-            response = requests.post(url, headers=headers, data=request.body, stream=True)
-        elif request.method == 'PUT':
-            response = requests.put(url, headers=headers, data=request.body, stream=True)
-        elif request.method == 'DELETE':
-            response = requests.delete(url, headers=headers, stream=True)
+        if request.method == "GET":
+            response = requests.get(url, params=request.GET)
+        elif request.method == "HEAD":
+            response = requests.head(url, headers=request.headers)
+        elif request.method == "POST":
+            response = requests.post(url, json=request.body, headers=request.headers)
+        elif request.method == "DELETE":
+            response = requests.delete(url, headers=request.headers)
         else:
-            return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+            return JsonResponse({"error": "Метод не поддерживается"}, status=405)
 
-        django_response = HttpResponse(
-            response.raw,  
+        return HttpResponse(
+            response.content,
             status=response.status_code,
-            content_type=response.headers.get('Content-Type')
+            content_type=response.headers.get('Content-Type', 'application/json')
         )
-        
-        for header, value in response.headers.items():
-            if header.lower() not in ['content-encoding', 'transfer-encoding', 'content-length']:
-                django_response[header] = value
-
-        return django_response
-
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to connect to the main server', 'details': str(e)}, status=500)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": str(e)}, status=500)
