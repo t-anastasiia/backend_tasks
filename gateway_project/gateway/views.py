@@ -6,9 +6,17 @@ BASE_SERVER_URL = 'https://backend-tasks-9r0i.onrender.com/'
 
 @csrf_exempt
 def root_view(request):
-    if request.method == 'HEAD' or request.method == 'GET':
-        url = BASE_SERVER_URL  
-        headers = {key: value for key, value in request.headers.items() if key.lower() != 'host'}
+    try:
+        response = requests.request(
+            method=request.method,
+            url=BASE_SERVER_URL,
+            headers={key: value for key, value in request.headers.items() if key.lower() != 'host'},
+            data=request.body,
+            params=request.GET
+        )
+        return HttpResponse(response.content, status=response.status_code, content_type=response.headers.get('Content-Type'))
+    except requests.RequestException as e:
+        return HttpResponse(f"Error: {e}", status=500)
 
 @csrf_exempt
 def proxy_view(request, path=""):
