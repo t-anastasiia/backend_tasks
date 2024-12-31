@@ -12,7 +12,7 @@ class GatewayView(APIView):
         headers = {
             key: value for key, value in request.headers.items() if key != 'Host'
         }
-        data = request.data if method in ['POST', 'PUT', 'PATCH'] else None
+        data = request.body if method in ['POST', 'PUT', 'PATCH'] else None
 
         try:
             response = requests.request(method, url, headers=headers, data=data)
@@ -28,9 +28,9 @@ class GatewayView(APIView):
             )
 
     def get(self, request, *args, **kwargs):
-        endpoint = request.path_info.lstrip('/')  # Убираем ведущий слэш
+        endpoint = request.path_info.lstrip('/')  
         return self.forward_request(request, endpoint)
 
     def post(self, request, *args, **kwargs):
-        endpoint = request.path_info.lstrip('/')  # Убираем ведущий слэш
+        endpoint = request.path_info.lstrip('/') 
         return self.forward_request(request, endpoint)
