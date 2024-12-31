@@ -1,6 +1,7 @@
-from django.urls import path, re_path
-from . import views
+from django.urls import re_path
+from .views import proxy_request
 
 urlpatterns = [
-    re_path(r'^(?P<path>.*)$', views.gateway_view, name='gateway'),
+    # Прокси для всех запросов
+    re_path(r'^(?P<path>.*)$', proxy_request, name="proxy_request"),
 ]
