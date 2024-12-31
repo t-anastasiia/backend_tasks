@@ -15,15 +15,21 @@ def proxy_view(request, path):
             response = requests.get(url, headers=headers, params=request.GET)
         elif request.method == 'POST':
             if request.content_type == 'application/json':
-                response = requests.post(url, headers=headers, json=request.body)
+                response = requests.post(url, headers=headers, json=request.body.decode('utf-8'))
             else:
                 data = QueryDict(request.body)
                 response = requests.post(url, headers=headers, data=data)
         elif request.method == 'PUT':
-            response = requests.put(url, headers=headers, json=request.body)
+            response = requests.put(url, headers=headers, json=request.body.decode('utf-8'))
         elif request.method == 'DELETE':
             response = requests.delete(url, headers=headers)
+        else:
+            return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
-        return HttpResponse(response.content, status=response.status_code, content_type=response.headers.get('Content-Type', 'text/plain'))
+        return HttpResponse(
+            response.content, 
+            status=response.status_code, 
+            content_type=response.headers.get('Content-Type', 'text/plain')
+        )
     except requests.RequestException as e:
         return JsonResponse({'error': 'Failed to connect to the main server', 'details': str(e)}, status=500)
