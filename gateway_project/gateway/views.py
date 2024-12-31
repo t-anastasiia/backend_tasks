@@ -9,7 +9,7 @@ BASE_SERVER_URL = "https://backend-tasks-9r0i.onrender.com"
 def proxy_request(request, path=""):
     """Перенаправление запросов на основной сервер."""
     # Формируем конечный URL
-    target_url = f"{BASE_SERVER_URL}/{path}"
+    target_url = f"{BASE_SERVER_URL}{path}"
     
     try:
         # Проверяем метод запроса и перенаправляем
