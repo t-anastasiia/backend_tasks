@@ -1,6 +1,7 @@
-from django.urls import path, re_path
-from . import views
+from django.urls import path
+from .views import proxy_view
 
 urlpatterns = [
-    re_path(r'^(?P<path>.*)$', views.proxy_view), 
+    path('', proxy_view, {'path': ''}),  # Корневой путь
+    path('<path:path>', proxy_view),     # Все остальные пути
 ]
