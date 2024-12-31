@@ -10,6 +10,8 @@ def proxy_view(request, path):
     url = BASE_SERVER_URL + path
     headers = {key: value for key, value in request.headers.items() if key != 'Host'}
 
+    print(f"Proxy Request: {request.method}, Headers: {headers}, Body: {request.body}")
+
     try:
         if request.method == 'GET':
             response = requests.get(url, headers=headers, params=request.GET)
